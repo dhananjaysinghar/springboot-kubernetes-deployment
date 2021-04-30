@@ -57,3 +57,32 @@ kubectl apply -f deployment.yaml -n productservice
 #docker run -p 8080:8080 productservice
 
 ~~~
+
+### Advance:
+~~~
+kubectl create namespace productservice
+kubectl config set-context --current --namespace=productservice
+kubectl create -f deployment.yaml -n productservice (change replicas=2  if already deployment is there run "kubectl apply -f deployment.yaml -n productservice")
+kubectl expose deployment productservice --type=LoadBalancer --name=productservice  --port=8080 (if already there delete using "kubectl delete service productservice")
+kubectl describe services productservice
+kubectl autoscale deployment productservice --cpu-percent=60 --min=1 --max=10
+kubectl get hpa
+kubectl get pods --output=wide
+kubectl edit deploy productservice
+
+minikube tunnel (any issue just run)
+~~~
+## Load Test using busybox
+~~~
+kubectl run -i --tty load-generator --image=busybox /bin/sh  
+while true; do wget -q -O- http://productservice:8080/token/getAdminToken; done
+
+jmeter -JSERVICE_HOST=127.0.0.1 -Jprotocol=http -Jport=8080 -JthreadCount=300 -JloadTime=120 -JstartUpTime=30 -JtestEnv=127.0.0.1 -n -t C:\Users\Dhananjay\Desktop\Kubernetes\CICD_PCF_Spring_Boot_With_JWT_Security-master\CICD_PCF_Spring_Boot_With_JWT_Security-master\jmeter_script.jmx -l .\target\TestResult.csv -e -o .\target\Results-TestResult
+
+~~~
+
+## login inside pod:
+~~~
+kubectl exec -it pod/productservice-58fd9946c4-kwc6k bash
+~~~
+
