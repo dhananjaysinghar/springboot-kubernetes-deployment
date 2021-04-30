@@ -1,37 +1,56 @@
-# Cloud_Deployment_PCF_Spring_Boot
 
-Cloud URL: https://productservice.cfapps.io/swagger-ui.html
-
-Create a account in https://login.run.pivotal.io/login
+### Docker Download from
+https://www.docker.com/products/docker-desktop
 
 
-How to deploy application on Pivotal Cloud Foundry
-Download Cloud Foundry CLI using below URL:
-Link: https://github.com/cloudfoundry/cli#installers-and-compressed-binaries
+### Minikube Install from
+https://minikube.sigs.k8s.io/docs/start/
 
 
-In your application add a file manifest.yml with below configuration
-=====================================================================
----
-applications:
-- name: ProductService
-  instances: 1
-  memory: 1G
-  path: target/ProductService-0.0.1-SNAPSHOT.jar
-  domain: cfapps.io
+### minikube steps:
+mvn clean install
+docker build -f Dockerfile -t productservice .
+docker tag productservice mail4dhananjaya/productservice
+docker push mail4dhananjaya/productservice:latest
 
-===================================================  
-
-Use command > cf login  and login to application  if it will ask for APIEndpoint use http://api.run.pivotal.io
-
-Go into your application location and use command: cf push
-This command will automatically deploy and start your application on PCF, you can see the details by login to PCF console  
-https://console.run.pivotal.io/
-
-Go to routes to check the app URL:  https://productservice.cfapps.io/swagger-ui.html#/
-
-If you want to remove your app from cloud use command  : cf delete ProductService
+minikube start
+minikube status
+kubectl get nodes
+kubectl create namespace productservice
+kubectl create deployment productservice --image=mail4dhananjaya/productservice:latest --dry-run=client -o=yaml > deployment.yaml
+kubectl create service clusterip productservice --tcp=8080:8080 --dry-run=client -o=yaml > service.yaml
+kubectl create -f deployment.yaml -n productservice
+kubectl create -f service.yaml -n productservice
+kubectl get all -n productservice
+kubectl logs pod/productservice-58fd9946c4-brd8d -n productservice
+kubectl port-forward service/productservice 8080:8080 -n productservice
 
 
+~~~
+ty-master>kubectl get all -n productservice
+NAME                                  READY   STATUS    RESTARTS   AGE
+pod/productservice-58fd9946c4-v8l4k   1/1     Running   4          27m
 
-Add your PCF credentials in to Jenkins while creating Pipeline Job
+NAME                     TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+service/productservice   ClusterIP   10.108.110.250   <none>        8080/TCP   41m
+
+NAME                             READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/productservice   1/1     1            1           41m
+
+NAME                                        DESIRED   CURRENT   READY   AGE
+replicaset.apps/productservice-58fd9946c4   1         1         1       41m
+~~~
+
+
+#### others:
+kubectl delete ns test-namespace
+
+kubectl label pods pod/productservice-58fd9946c4-v8l4k new-label=productservice
+kubectl apply -f deployment.yaml -n productservice
+
+Docker commands
+#docker build -f Dockerfile -t productservice .
+#docker images
+#docker run -p 8080:8080 productservice
+
+
