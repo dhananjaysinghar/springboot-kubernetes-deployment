@@ -45,7 +45,7 @@ replicaset.apps/productservice-58fd9946c4   1         1         1       41m
 
 #### others:
 ~~~
-kubectl delete ns test-namespace
+kubectl delete ns productservice
 
 kubectl label pods pod/productservice-58fd9946c4-v8l4k new-label=productservice
 kubectl apply -f deployment.yaml -n productservice
@@ -58,7 +58,7 @@ kubectl apply -f deployment.yaml -n productservice
 
 ~~~
 
-### Advance:
+## Advance:
 ~~~
 kubectl create namespace productservice
 kubectl config set-context --current --namespace=productservice
