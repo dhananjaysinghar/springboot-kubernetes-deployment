@@ -8,6 +8,7 @@ https://minikube.sigs.k8s.io/docs/start/
 
 
 ### minikube steps:
+~~~
 mvn clean install
 docker build -f Dockerfile -t productservice .
 docker tag productservice mail4dhananjaya/productservice
@@ -24,7 +25,7 @@ kubectl create -f service.yaml -n productservice
 kubectl get all -n productservice
 kubectl logs pod/productservice-58fd9946c4-brd8d -n productservice
 kubectl port-forward service/productservice 8080:8080 -n productservice
-
+~~~
 
 ~~~
 ty-master>kubectl get all -n productservice
@@ -43,14 +44,16 @@ replicaset.apps/productservice-58fd9946c4   1         1         1       41m
 
 
 #### others:
+~~~
 kubectl delete ns test-namespace
 
 kubectl label pods pod/productservice-58fd9946c4-v8l4k new-label=productservice
 kubectl apply -f deployment.yaml -n productservice
-
-Docker commands
+~~~
+### Docker commands
+~~~
 #docker build -f Dockerfile -t productservice .
 #docker images
 #docker run -p 8080:8080 productservice
 
-
+~~~
